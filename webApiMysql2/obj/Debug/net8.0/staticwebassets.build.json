@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "iD0w2xHYxERyvqAllNSWwPQqjA3O17h1RSGx0LJ2PR0=",
+  "Source": "webApiMysql2",
+  "BasePath": "_content/webApiMysql2",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

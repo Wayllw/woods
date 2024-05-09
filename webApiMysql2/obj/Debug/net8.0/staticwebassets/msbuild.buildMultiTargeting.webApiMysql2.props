@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\webApiMysql2.props" />
+</Project>

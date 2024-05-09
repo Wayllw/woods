@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "webApiMysql2", "webApiMysql2.csproj", "{1AC85168-64B4-45F5-8E29-37FA8CC8B99F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1AC85168-64B4-45F5-8E29-37FA8CC8B99F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1AC85168-64B4-45F5-8E29-37FA8CC8B99F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1AC85168-64B4-45F5-8E29-37FA8CC8B99F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1AC85168-64B4-45F5-8E29-37FA8CC8B99F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7AC3B56F-8204-4F44-8D75-E6976F3D4009}
+	EndGlobalSection
+EndGlobal
