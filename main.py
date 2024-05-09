@@ -20,8 +20,8 @@ def exportarInfo(id, path):
 
 def addInfo(id, title, content):
     json = {"id": id, "title": title, "content": content}
-    response = requests.post(baseurl, json=json)
-    print(response.json())
+    requests.post(baseurl, json=json)
+    print(json)
 
 
 def importInfo(file):
