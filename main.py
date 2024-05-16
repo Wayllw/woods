@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import font, filedialog
 import requests
 import json
+import csv
 import ast
 
 baseurl = "http://localhost:5175/api/blog/"
@@ -16,6 +17,23 @@ def exportarInfo(id, path):
     json.dump(dict_dat, fw)
     fw.write("\n")
     print(response)
+
+
+def exportarCsv(id, path):
+    response = requests.get(baseurl+"csv/"+id)
+    print(response.text)
+    csv_file = path+".csv"
+
+    csv_obj = open(csv_file, "w")
+    csv_writer = csv.writer(csv_obj)
+
+    data = response.text.splitlines()
+    for row in csv.reader(data):
+        csv_writer.writerow(row)
+    csv_obj.close()
+
+    print(response)
+
 
 
 def addInfo(id, title, content):
@@ -162,6 +180,13 @@ def buildGet():
         exportarInfo(id, path)
         jnl.destroy()
 
+
+    def confirm3():
+        id = entry_id.get()
+        path = file_path_label.cget("text")
+        exportarCsv(id, path)
+        jnl.destroy()
+
     jnl = tk.Tk()
     jnl.title("Introduzir dados")
     label_id = tk.Label(jnl, text="ID:")
@@ -174,11 +199,14 @@ def buildGet():
     button_s.grid(row=2, column=1)
     button_d = tk.Button(jnl, text="Exportar", command=confirm2)
     button_d.grid(row=3, column=1)
+    button_c = tk.Button(jnl, text="CSV", command=confirm3)
+    button_c.grid(row=4, column=1)
     jnl.configure(bg="#61affe")
     label_id.configure(bg="#61affe", fg="white", font=bold)
     file_path_label.configure(bg="#61affe", fg="white", font=bold)
     button_s.configure(bg="#61affe", fg="white", font=bold)
     button_d.configure(bg="#61affe", fg="white", font=bold)
+    button_c.configure(bg="#61affe", fg="white", font=bold)
 
 
 def buildDel():

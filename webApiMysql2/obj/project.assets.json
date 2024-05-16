@@ -723,11 +723,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\rui26\\Desktop\\Faculdade\\webApiMysql2\\webApiMysql2.csproj",
+      "projectUniqueName": "C:\\Users\\rui26\\PycharmProjects\\woods\\webApiMysql2\\webApiMysql2.csproj",
       "projectName": "webApiMysql2",
-      "projectPath": "C:\\Users\\rui26\\Desktop\\Faculdade\\webApiMysql2\\webApiMysql2.csproj",
+      "projectPath": "C:\\Users\\rui26\\PycharmProjects\\woods\\webApiMysql2\\webApiMysql2.csproj",
       "packagesPath": "C:\\Users\\rui26\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\rui26\\Desktop\\Faculdade\\webApiMysql2\\obj\\",
+      "outputPath": "C:\\Users\\rui26\\PycharmProjects\\woods\\webApiMysql2\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\rui26\\AppData\\Roaming\\NuGet\\NuGet.Config",

@@ -23,6 +23,7 @@ app.MapGet("/api/blog", async ([FromServices] MySqlDataSource db) =>
     var repository = new BlogPostRepository(db);
     return await repository.LatestPostsAsync();
 });
+
 // GET api/blog/5
 app.MapGet("/api/blog/{id}", async ([FromServices] MySqlDataSource db, int id) =>
 {
@@ -30,6 +31,22 @@ app.MapGet("/api/blog/{id}", async ([FromServices] MySqlDataSource db, int id) =
     var result = await repository.FindOneAsync(id);
     return result is null ? Results.NotFound() : Results.Ok(result);
 });
+
+app.MapGet("/api/blog/csv", async ([FromServices] MySqlDataSource db) =>
+{
+    var repository = new BlogPostRepository(db);
+    return await repository.transCsv();
+});
+
+app.MapGet("/api/blog/csv/{id}", async ([FromServices] MySqlDataSource db, int id) =>
+{
+    var repository = new BlogPostRepository(db);
+    var result = await repository.transCsvId(id);
+    return result is null ? Results.NotFound() : Results.Ok(result);
+});
+
+
+
 // POST api/blog
 app.MapPost("/api/blog", async ([FromServices] MySqlDataSource db, [FromBody] List<BlogPost> body) =>
 {
@@ -37,6 +54,7 @@ app.MapPost("/api/blog", async ([FromServices] MySqlDataSource db, [FromBody] Li
     await repository.InsertAsync2(body);
       return body;
 });
+
 // PUT api/blog/5
 app.MapPut("/api/blog/{id}", async (int id, [FromServices] MySqlDataSource db, [FromBody] BlogPost body) =>
 {
@@ -49,6 +67,7 @@ app.MapPut("/api/blog/{id}", async (int id, [FromServices] MySqlDataSource db, [
     await repository.UpdateAsync(result);
     return Results.Ok(result);
 });
+
 // DELETE api/blog/5
 app.MapDelete("/api/blog/{id}", async ([FromServices] MySqlDataSource db, int id) =>
 {
@@ -59,6 +78,7 @@ app.MapDelete("/api/blog/{id}", async ([FromServices] MySqlDataSource db, int id
     await repository.DeleteAsync(result);
     return Results.NoContent();
 });
+
 // DELETE api/blog
 app.MapDelete("/api/blog", async ([FromServices] MySqlDataSource db) =>
 {
