@@ -53,7 +53,7 @@ public class BlogPostRepository(MySqlDataSource database)
         var data = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(jsonContent);
         string csv = ConvertToCSV(data);
 
-        return jsonContent;
+        return csv;
     }
 
     public async Task<string> transCsvId(int id)
