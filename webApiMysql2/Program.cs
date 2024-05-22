@@ -2,6 +2,7 @@ using BlogPostApi;
 using Microsoft.AspNetCore.Mvc;
 using MySqlConnector;
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddControllers();
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at
 //https://aka.ms/aspnetcore/swashbuckle
@@ -86,4 +87,7 @@ app.MapDelete("/api/blog", async ([FromServices] MySqlDataSource db) =>
     await repository.DeleteAllAsync();
     return Results.NoContent();
 });
+app.UseHttpsRedirection();
+app.UseAuthorization();
+app.MapControllers();
 app.Run();

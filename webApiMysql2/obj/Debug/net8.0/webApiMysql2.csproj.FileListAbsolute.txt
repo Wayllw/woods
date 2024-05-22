@@ -71,3 +71,8 @@ c:\Users\rui26\PycharmProjects\woods\webApiMysql2\obj\Debug\net8.0\scopedcss\bun
 C:\Users\rui26\PycharmProjects\woods\webApiMysql2\obj\Debug\net8.0\webApiMy.5C8E05DC.Up2Date
 C:\Users\rui26\PycharmProjects\woods\webApiMysql2\obj\Debug\net8.0\webApiMysql2.genruntimeconfig.cache
 C:\Users\rui26\PycharmProjects\woods\webApiMysql2\obj\Debug\net8.0\ref\webApiMysql2.dll
+c:\Users\rui26\PycharmProjects\woods\webApiMysql2\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
+c:\Users\rui26\PycharmProjects\woods\webApiMysql2\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
+c:\Users\rui26\PycharmProjects\woods\webApiMysql2\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
+c:\Users\rui26\PycharmProjects\woods\webApiMysql2\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
+c:\Users\rui26\PycharmProjects\woods\webApiMysql2\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
