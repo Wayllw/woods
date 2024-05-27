@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 10-Maio-2024 às 00:05
+-- Tempo de geração: 28-Maio-2024 às 00:19
 -- Versão do servidor: 10.4.28-MariaDB
 -- versão do PHP: 8.2.4
 
@@ -147,6 +147,28 @@ INSERT INTO `blogpost` (`Id`, `Title`, `Content`) VALUES
 (246, 'Ola', 'Eu sou bue bonito'),
 (247, 'string', 'string');
 
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `usuarios`
+--
+
+CREATE TABLE `usuarios` (
+  `Id` int(11) NOT NULL,
+  `username` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Extraindo dados da tabela `usuarios`
+--
+
+INSERT INTO `usuarios` (`Id`, `username`, `password`) VALUES
+(1, 'artur', 'gelado123'),
+(4, 'armando', 'quimbe'),
+(5, 'abc', '123'),
+(6, 'username', 'password');
+
 --
 -- Índices para tabelas despejadas
 --
@@ -158,6 +180,12 @@ ALTER TABLE `blogpost`
   ADD PRIMARY KEY (`Id`);
 
 --
+-- Índices para tabela `usuarios`
+--
+ALTER TABLE `usuarios`
+  ADD PRIMARY KEY (`Id`);
+
+--
 -- AUTO_INCREMENT de tabelas despejadas
 --
 
@@ -166,6 +194,12 @@ ALTER TABLE `blogpost`
 --
 ALTER TABLE `blogpost`
   MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=248;
+
+--
+-- AUTO_INCREMENT de tabela `usuarios`
+--
+ALTER TABLE `usuarios`
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
