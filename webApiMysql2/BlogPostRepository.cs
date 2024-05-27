@@ -81,8 +81,6 @@ public class BlogPostRepository(MySqlDataSource database)
         return biblioteca.ToString();
     }
 
-    
-
     public async Task DeleteAllAsync()
     {
         using var connection = await database.OpenConnectionAsync();

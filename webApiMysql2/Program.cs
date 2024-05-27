@@ -1,6 +1,7 @@
 using BlogPostApi;
 using Microsoft.AspNetCore.Mvc;
 using MySqlConnector;
+using WebApplicationToken.Controllers;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Add services to the container.
@@ -17,6 +18,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseHttpsRedirection();
+
 
 // GET api/blog
 app.MapGet("/api/blog", async ([FromServices] MySqlDataSource db) =>
