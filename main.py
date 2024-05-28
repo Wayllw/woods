@@ -7,7 +7,7 @@ import ast
 
 baseurl = "http://localhost:5175/api/blog/"
 
-tok = None
+tok: str = None
 
 
 def exportarInfo(id, path):
@@ -39,10 +39,9 @@ def exportarCsv(id, path):
     print(response)
 
 
-
 def addInfo(id, title, content):
     json = {"id": id, "title": title, "content": content}
-    requests.post(baseurl+ "?token=" + tok, json=json)
+    requests.post(baseurl + "?token=" + tok, json=json)
     print(json)
 
 
@@ -51,7 +50,6 @@ def importInfo(file):
         data = json.load(importation)
     requests.post(baseurl, json=data)
     print(data)
-
 
 
 def editInfo(id, title, content):
@@ -182,7 +180,6 @@ def buildGet():
         exportarInfo(id, path)
         jnl.destroy()
 
-
     def confirm3():
         id = entry_id.get()
         path = file_path_label.cget("text")
@@ -197,7 +194,7 @@ def buildGet():
     entry_id.grid(row=0, column=1)
     label_txt = tk.Label(jnl, text="Deixar o id em branco,  leva ao ")
     label_txt.grid(row=2, column=0, columnspan=3)
-    label_tx= tk.Label(jnl, text="descarregamento total da base de dados")
+    label_tx = tk.Label(jnl, text="descarregamento total da base de dados")
     label_tx.grid(row=3, column=0, columnspan=3)
     button_s = tk.Button(jnl, text="Browse", command=confirm)
     file_path_label = tk.Label(jnl)
