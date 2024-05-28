@@ -42,7 +42,7 @@ def exportarCsv(id, path):
 
 def addInfo(id, title, content):
     json = {"id": id, "title": title, "content": content}
-    requests.post(baseurl, json=json)
+    requests.post(baseurl+ "?token=" + tok, json=json)
     print(json)
 
 
@@ -296,6 +296,7 @@ def bt():
     def cToken():
         tkn = tokn_entry.get()
         rr = requests.get("http://localhost:5175/api/Auth/validate-token?token="+tkn)
+        token.destroy()
         if rr.status_code==200:
             build()
         else:

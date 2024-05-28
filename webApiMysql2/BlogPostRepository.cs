@@ -70,32 +70,48 @@ public class BlogPostRepository(MySqlDataSource database)
 
     }
 
-    public async Task<string> transCsv()
+    public async Task<string> transCsv(string token)
     {
-        using var connection = await database.OpenConnectionAsync();
-        using var command = connection.CreateCommand();
-        command.CommandText = @"SELECT `Id`, `Title`, `Content` FROM `BlogPost` ORDER BY `Id` DESC;";
-        IReadOnlyList<BlogPost> BlogP = await ReadAllAsync(await command.ExecuteReaderAsync());
-        string jsonContent = JsonConvert.SerializeObject(BlogP);
-        // Converter JSON para CSV
-        var data = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(jsonContent);
-        string csv = ConvertToCSV(data);
 
-        return csv;
+        var (subject, expiration) = ValidateJwtToken(token);
+        if (subject != null && expiration != null)
+        {
+            using var connection = await database.OpenConnectionAsync();
+            using var command = connection.CreateCommand();
+            command.CommandText = @"SELECT `Id`, `Title`, `Content` FROM `BlogPost` ORDER BY `Id` DESC;";
+            IReadOnlyList<BlogPost> BlogP = await ReadAllAsync(await command.ExecuteReaderAsync());
+            string jsonContent = JsonConvert.SerializeObject(BlogP);
+            var data = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(jsonContent);
+            string csv = ConvertToCSV(data);
+            return csv;
+        }
+        else
+        {
+            return null;
+        }
     }
 
-    public async Task<string> transCsvId(int id)
+    public async Task<string> transCsvId(int id, string token)
     {
-        using var connection = await database.OpenConnectionAsync();
-        using var command = connection.CreateCommand();
-        command.CommandText = @"SELECT `Id`, `Title`, `Content` FROM `BlogPost` WHERE `Id` = @id";
-        command.Parameters.AddWithValue("@id", id);
 
-        IReadOnlyList<BlogPost> BlogP = await ReadAllAsync(await command.ExecuteReaderAsync());
-        string jsonContent = JsonConvert.SerializeObject(BlogP);
-        var data = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(jsonContent);
-        string csv = ConvertToCSV(data);
-        return csv;
+        var (subject, expiration) = ValidateJwtToken(token);
+        if (subject != null && expiration != null)
+        {
+            using var connection = await database.OpenConnectionAsync();
+            using var command = connection.CreateCommand();
+            command.CommandText = @"SELECT `Id`, `Title`, `Content` FROM `BlogPost` WHERE `Id` = @id";
+            command.Parameters.AddWithValue("@id", id);
+
+            IReadOnlyList<BlogPost> BlogP = await ReadAllAsync(await command.ExecuteReaderAsync());
+            string jsonContent = JsonConvert.SerializeObject(BlogP);
+            var data = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(jsonContent);
+            string csv = ConvertToCSV(data);
+            return csv;
+        }
+        else
+        {
+            return null;
+        }
     }
 
     static string ConvertToCSV(List<Dictionary<string, string>> data)
@@ -109,21 +125,30 @@ public class BlogPostRepository(MySqlDataSource database)
         return biblioteca.ToString();
     }
 
-    public async Task DeleteAllAsync()
+    public async Task DeleteAllAsync(string token)
     {
-        using var connection = await database.OpenConnectionAsync();
-        using var command = connection.CreateCommand();
-        command.CommandText = @"DELETE FROM `BlogPost`";
-        await command.ExecuteNonQueryAsync();
+
+        var (subject, expiration) = ValidateJwtToken(token);
+        if (subject != null && expiration != null)
+        {
+            using var connection = await database.OpenConnectionAsync();
+            using var command = connection.CreateCommand();
+            command.CommandText = @"DELETE FROM `BlogPost`";
+            await command.ExecuteNonQueryAsync();
+        }
     }
-    public async Task InsertAsync(BlogPost blogPost)
+    public async Task InsertAsync(BlogPost blogPost, string token)
     {
-        using var connection = await database.OpenConnectionAsync();
-        using var command = connection.CreateCommand();
-        command.CommandText = @"INSERT INTO `BlogPost` (`Title`, `Content`) VALUES (@title, @content);";
-        BindParams(command, blogPost);
-        await command.ExecuteNonQueryAsync();
-        blogPost.Id = (int)command.LastInsertedId;
+        var (subject, expiration) = ValidateJwtToken(token);
+        if (subject != null && expiration != null)
+        {
+            using var connection = await database.OpenConnectionAsync();
+            using var command = connection.CreateCommand();
+            command.CommandText = @"INSERT INTO `BlogPost` (`Title`, `Content`) VALUES (@title, @content);";
+            BindParams(command, blogPost);
+            await command.ExecuteNonQueryAsync();
+            blogPost.Id = (int)command.LastInsertedId;
+        }
     }
 
     public async Task UpdateAsync(BlogPost blogPost)
@@ -135,12 +160,16 @@ public class BlogPostRepository(MySqlDataSource database)
         BindId(command, blogPost);
         await command.ExecuteNonQueryAsync();
     }
-    public async Task DeleteAsync(BlogPost blogPost)
+    public async Task DeleteAsync(BlogPost blogPost, string token)
     {
-        using var connection = await database.OpenConnectionAsync();
-        using var command = connection.CreateCommand();
-        command.CommandText = @"DELETE FROM `BlogPost` WHERE `Id` = @id;"; BindId(command, blogPost);
-        await command.ExecuteNonQueryAsync();
+        var (subject, expiration) = ValidateJwtToken(token);
+        if (subject != null && expiration != null)
+        {
+            using var connection = await database.OpenConnectionAsync();
+            using var command = connection.CreateCommand();
+            command.CommandText = @"DELETE FROM `BlogPost` WHERE `Id` = @id;"; BindId(command, blogPost);
+            await command.ExecuteNonQueryAsync();
+        }
     }
     private async Task<IReadOnlyList<BlogPost>> ReadAllAsync(DbDataReader reader)
     {
@@ -169,10 +198,12 @@ public class BlogPostRepository(MySqlDataSource database)
         cmd.Parameters.AddWithValue("@title", blogPost.Title); cmd.Parameters.AddWithValue("@content", blogPost.Content);
     }
 
-    internal async Task InsertAsync2(List<BlogPost> body)
+    internal async Task InsertAsync2(List<BlogPost> body, string token)
     {
-        // var objects = Newtonsoft.Json.JsonConvert.DeserializeObject<List<BlogPost>>(lista);
-        using var connection = await database.OpenConnectionAsync();
+        var (subject, expiration) = ValidateJwtToken(token);
+        if (subject != null && expiration != null)
+        {
+            using var connection = await database.OpenConnectionAsync();
         using (var command = connection.CreateCommand())
         {
             command.CommandText = @"INSERT INTO `BlogPost` (`Title`, `Content`) VALUES (@title, @content);";
@@ -183,6 +214,7 @@ public class BlogPostRepository(MySqlDataSource database)
                 command.ExecuteNonQuery();
                 command.Parameters.Clear();
             }
+        }
         }
     }
 

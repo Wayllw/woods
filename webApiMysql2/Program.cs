@@ -35,26 +35,26 @@ app.MapGet("/api/blog/{id}", async ([FromServices] MySqlDataSource db, int id, s
     return result is null ? Results.NotFound() : Results.Ok(result);
 });
 
-app.MapGet("/api/blog/csv", async ([FromServices] MySqlDataSource db) =>
+app.MapGet("/api/blog/csv", async ([FromServices] MySqlDataSource db, string token) =>
 {
     var repository = new BlogPostRepository(db);
-    return await repository.transCsv();
+    return await repository.transCsv(token);
 });
 
-app.MapGet("/api/blog/csv/{id}", async ([FromServices] MySqlDataSource db, int id) =>
+app.MapGet("/api/blog/csv/{id}", async ([FromServices] MySqlDataSource db, int id, string token) =>
 {
     var repository = new BlogPostRepository(db);
-    var result = await repository.transCsvId(id);
+    var result = await repository.transCsvId(id, token);
     return result is null ? Results.NotFound() : Results.Ok(result);
 });
 
 
 
 // POST api/blog
-app.MapPost("/api/blog", async ([FromServices] MySqlDataSource db, [FromBody] List<BlogPost> body) =>
+app.MapPost("/api/blog", async ([FromServices] MySqlDataSource db, [FromBody] List<BlogPost> body, string token) =>
 {
     var repository = new BlogPostRepository(db);
-    await repository.InsertAsync2(body);
+    await repository.InsertAsync2(body, token);
       return body;
 });
 
@@ -78,15 +78,15 @@ app.MapDelete("/api/blog/{id}", async ([FromServices] MySqlDataSource db, int id
     var result = await repository.FindOneAsync(id, token);
     if (result is null)
         return Results.NotFound();
-    await repository.DeleteAsync(result);
+    await repository.DeleteAsync(result, token);
     return Results.NoContent();
 });
 
 // DELETE api/blog
-app.MapDelete("/api/blog", async ([FromServices] MySqlDataSource db) =>
+app.MapDelete("/api/blog", async ([FromServices] MySqlDataSource db, string token) =>
 {
     var repository = new BlogPostRepository(db);
-    await repository.DeleteAllAsync();
+    await repository.DeleteAllAsync(token);
     return Results.NoContent();
 });
 app.UseHttpsRedirection();
