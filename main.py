@@ -23,7 +23,8 @@ def exportarInfo(id, path):
 
 
 def exportarCsv(id, path):
-    response = requests.get(baseurl+"csv/"+id)
+    global tok
+    response = requests.get(baseurl+"csv/"+id + "?token=" + tok)
     print(response.text)
     csv_file = path+".csv"
 
@@ -268,15 +269,16 @@ def build():
     window.mainloop()
 
 def logIn(username, password):
+    global tok
     url = "http://localhost:5175/api/Auth/login"
     json={"username": username, "password": password}
     response = requests.post(url,json=json)
     print(response)
     if response.status_code==200:
         login.destroy()
-        tonk=response.json().get('token')
-        open("token.txt",'w').write(tonk)
-        print(tonk)
+        tok=response.json().get('token')
+        open("token.txt",'w').write(tok)
+        print(tok)
         bt()
     elif response.status_code==401:
         print("Erro na aventura")
