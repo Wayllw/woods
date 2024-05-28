@@ -22,24 +22,52 @@ using System.Text.Json;
 using System.Data.Common;
 using MySqlConnector;
 using System.Text.RegularExpressions;
+using WebApplicationToken.Controllers;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
 namespace BlogPostApi;
+
+
 public class BlogPostRepository(MySqlDataSource database)
 {
-    public async Task<BlogPost?> FindOneAsync(int id)
+    private readonly string _secretKey = "SecretKeywqewqeqqqqqqqqqqqweeeeeeeeeeeeeeeeeeeqweqe";
+
+    public async Task<BlogPost?> FindOneAsync(int id, string token)
     {
-        using var connection = await database.OpenConnectionAsync();
-        using var command = connection.CreateCommand();
-        command.CommandText = @"SELECT `Id`, `Title`, `Content` FROM `BlogPost` WHERE `Id` = @id";
-        command.Parameters.AddWithValue("@id", id);
-        var result = await ReadAllAsync(await command.ExecuteReaderAsync());
-        return result.FirstOrDefault();
+        var (subject, expiration) = ValidateJwtToken(token);
+        if (subject != null && expiration != null)
+        {
+            using var connection = await database.OpenConnectionAsync();
+            using var command = connection.CreateCommand();
+            command.CommandText = @"SELECT `Id`, `Title`, `Content` FROM `BlogPost` WHERE `Id` = @id";
+            command.Parameters.AddWithValue("@id", id);
+            var result = await ReadAllAsync(await command.ExecuteReaderAsync());
+            return result.FirstOrDefault();
+        }
+        else
+        {
+            return null;
+        }
+
+
     }
-    public async Task<IReadOnlyList<BlogPost>> LatestPostsAsync()
+    public async Task<IReadOnlyList<BlogPost>> LatestPostsAsync(string token)
     {
-        using var connection = await database.OpenConnectionAsync();
-        using var command = connection.CreateCommand();
-        command.CommandText = @"SELECT `Id`, `Title`, `Content` FROM `BlogPost` ORDER BY `Id` DESC;";
-        return await ReadAllAsync(await command.ExecuteReaderAsync());
+
+        var (subject, expiration) = ValidateJwtToken(token);
+        if (subject != null && expiration != null)
+        {
+            using var connection = await database.OpenConnectionAsync();
+            using var command = connection.CreateCommand();
+            command.CommandText = @"SELECT `Id`, `Title`, `Content` FROM `BlogPost` ORDER BY `Id` DESC;";
+            return await ReadAllAsync(await command.ExecuteReaderAsync());
+        }
+        else
+        {
+            return null;
+        }
+
+
     }
 
     public async Task<string> transCsv()
@@ -155,6 +183,37 @@ public class BlogPostRepository(MySqlDataSource database)
                 command.ExecuteNonQuery();
                 command.Parameters.Clear();
             }
+        }
+    }
+
+    private (string Subject, DateTime Expiration) ValidateJwtToken(string token)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.ASCII.GetBytes(_secretKey);
+        // Extrai o token JWT da string JSON, se estiver presente
+        var tokenParts = token.Split("\"");
+        if (tokenParts.Length >= 3)
+        {
+            token = tokenParts[3];
+        }
+        var tokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ClockSkew = TimeSpan.Zero
+        };
+        var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken validatedToken);
+        if (validatedToken != null)
+        {
+            var subject = principal.Identity.Name;
+            var expiration = validatedToken.ValidTo;
+            return (subject, expiration);
+        }
+        else
+        {
+            throw new SecurityTokenException("Invalid JWT token."); // Or handle invalid tokens differently
         }
     }
 }

@@ -21,17 +21,17 @@ app.UseHttpsRedirection();
 
 
 // GET api/blog
-app.MapGet("/api/blog", async ([FromServices] MySqlDataSource db) =>
+app.MapGet("/api/blog", async ([FromServices] MySqlDataSource db, string token) =>
 {
     var repository = new BlogPostRepository(db);
-    return await repository.LatestPostsAsync();
+    return await repository.LatestPostsAsync(token);
 });
 
 // GET api/blog/5
-app.MapGet("/api/blog/{id}", async ([FromServices] MySqlDataSource db, int id) =>
+app.MapGet("/api/blog/{id}", async ([FromServices] MySqlDataSource db, int id, string token) =>
 {
     var repository = new BlogPostRepository(db);
-    var result = await repository.FindOneAsync(id);
+    var result = await repository.FindOneAsync(id, token);
     return result is null ? Results.NotFound() : Results.Ok(result);
 });
 
@@ -59,10 +59,10 @@ app.MapPost("/api/blog", async ([FromServices] MySqlDataSource db, [FromBody] Li
 });
 
 // PUT api/blog/5
-app.MapPut("/api/blog/{id}", async (int id, [FromServices] MySqlDataSource db, [FromBody] BlogPost body) =>
+app.MapPut("/api/blog/{id}", async (int id, [FromServices] MySqlDataSource db, [FromBody] BlogPost body, string token) =>
 {
     var repository = new BlogPostRepository(db);
-    var result = await repository.FindOneAsync(id);
+    var result = await repository.FindOneAsync(id, token);
     if (result is null)
         return Results.NotFound();
     result.Title = body.Title;
@@ -72,10 +72,10 @@ app.MapPut("/api/blog/{id}", async (int id, [FromServices] MySqlDataSource db, [
 });
 
 // DELETE api/blog/5
-app.MapDelete("/api/blog/{id}", async ([FromServices] MySqlDataSource db, int id) =>
+app.MapDelete("/api/blog/{id}", async ([FromServices] MySqlDataSource db, int id, string token) =>
 {
     var repository = new BlogPostRepository(db);
-    var result = await repository.FindOneAsync(id);
+    var result = await repository.FindOneAsync(id, token);
     if (result is null)
         return Results.NotFound();
     await repository.DeleteAsync(result);

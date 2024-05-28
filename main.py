@@ -7,9 +7,12 @@ import ast
 
 baseurl = "http://localhost:5175/api/blog/"
 
+tok = None
+
 
 def exportarInfo(id, path):
-    response = requests.get(baseurl+id)
+    global tok
+    response = requests.get(baseurl + id + "?token=" + tok)
     response = str(response.json())
     fw = open(path+".json", "w")
     json_dat = json.dumps(ast.literal_eval(response))
@@ -49,6 +52,7 @@ def importInfo(file):
     print(data)
 
 
+
 def editInfo(id, title, content):
     json = {"id": id, "title": title, "content": content}
     response = requests.put(baseurl + id, json=json)
@@ -60,7 +64,6 @@ def deleteInfo(id):
 
 
 def buildPost():
-    window.destroy()
 
     def confirm():
         id = entry_id.get()
@@ -132,7 +135,6 @@ def buildPost():
 
 
 def buildPut():
-    window.destroy()
 
     def confirm():
         id = entry_id.get()
@@ -168,7 +170,6 @@ def buildPut():
 
 
 def buildGet():
-    window.destroy()
 
     def confirm():
         file_path = filedialog.asksaveasfilename()
@@ -220,7 +221,6 @@ def buildGet():
 
 
 def buildDel():
-    window.destroy()
 
     def confirm():
         id = entry_id.get()
@@ -246,22 +246,98 @@ def buildDel():
     textt_label.configure(bg="#f93e3e", fg="white", font=bold)
 
 
-window = tk.Tk()
+def build():
+    window = tk.Tk()
+    bold = font.Font(weight="bold")
+
+    window.title("Select what u want to do:")
+    window.eval('tk::PlaceWindow . center')
+    get_entry = tk.Button(window, text="Exportar", command=buildGet, width=20, height=5, font=bold)
+    get_entry.grid(row=0, column=0, sticky='EWNS')
+    post_entry = tk.Button(window, text="Importar", command=buildPost, width=20, height=5, font=bold)
+    post_entry.grid(row=0, column=1, sticky='EWNS')
+    put_entry = tk.Button(window, text="Editar", command=buildPut, width=20, height=5, font=bold)
+    put_entry.grid(row=1, column=0, sticky='EWNS')
+    delete_entry = tk.Button(window, text="Apagar", command=buildDel, width=20, height=5, font=bold)
+    delete_entry.grid(row=1, column=1, sticky='EWNS')
+
+    get_entry.configure(bg="#61affe", fg="white",)
+    post_entry.configure(bg="#49cc90", fg="white")
+    put_entry.configure(bg="#fca130", fg="white")
+    delete_entry.configure(bg="#f93e3e", fg="white")
+    window.mainloop()
+
+def logIn(username, password):
+    url = "http://localhost:5175/api/Auth/login"
+    json={"username": username, "password": password}
+    response = requests.post(url,json=json)
+    print(response)
+    if response.status_code==200:
+        login.destroy()
+        tonk=response.json().get('token')
+        open("token.txt",'w').write(tonk)
+        print(tonk)
+        bt()
+    elif response.status_code==401:
+        print("Erro na aventura")
+    else:
+        print("Algo inesperado aconteceu!")
+
+
+def confLog():
+    username = user_entry.get()
+    password = pass_entry.get()
+    logIn(username, password)
+
+
+def bt():
+    def cToken():
+        tkn = tokn_entry.get()
+        rr = requests.get("http://localhost:5175/api/Auth/validate-token?token="+tkn)
+        if rr.status_code==200:
+            build()
+        else:
+            print("Ocorreu um erro com o token.")
+
+
+    token = tk.Tk()
+    bold = font.Font(weight="bold")
+    token.title("Select what u want to do:")
+    token.eval('tk::PlaceWindow . center')
+    tokn_label = tk.Label(token, text="Token:", width=15, height=2, font=bold)
+    tokn_label.grid(row=0, column=0, sticky='EWNS')
+    tokn_entry = tk.Entry(token)
+    tokn_entry.grid(row=0, column=1, sticky='EWNS')
+    confirm_button = tk.Button(token, text="Confirm", command=cToken)
+    confirm_button.place(x=110, y=115, width=200, height=20)
+    token.geometry("400x140")
+    token.config(bg="#CCCCFF")
+    tokn_label.configure(bg="#CCCCFF", fg="black")
+    tokn_entry.configure(bg="#CCCCFF", fg="black")
+    confirm_button.configure(bg="#CCCCFF", fg="black")
+    token.mainloop()
+
+
+
+login = tk.Tk()
 bold = font.Font(weight="bold")
-
-window.title("Select what u want to do:")
-window.eval('tk::PlaceWindow . center')
-get_entry = tk.Button(window, text="Exportar", command=buildGet, width=20, height=5, font=bold)
-get_entry.grid(row=0, column=0, sticky='EWNS')
-post_entry = tk.Button(window, text="Importar", command=buildPost, width=20, height=5, font=bold)
-post_entry.grid(row=0, column=1, sticky='EWNS')
-put_entry = tk.Button(window, text="Editar", command=buildPut, width=20, height=5, font=bold)
-put_entry.grid(row=1, column=0, sticky='EWNS')
-delete_entry = tk.Button(window, text="Apagar", command=buildDel, width=20, height=5, font=bold)
-delete_entry.grid(row=1, column=1, sticky='EWNS')
-
-get_entry.configure(bg="#61affe", fg="white",)
-post_entry.configure(bg="#49cc90", fg="white")
-put_entry.configure(bg="#fca130", fg="white")
-delete_entry.configure(bg="#f93e3e", fg="white")
-window.mainloop()
+login.title("Select what u want to do:")
+login.eval('tk::PlaceWindow . center')
+user_label = tk.Label(login, text="User:", width=15, height=2, font=bold)
+user_label.grid(row=0, column=0, sticky='EWNS')
+user_entry = tk.Entry(login)
+user_entry.grid(row=0, column=1, sticky='EWNS')
+pass_label = tk.Label(login, text="Password:", width=15, height=2, font=bold)
+pass_label.grid(row=1, column=0, sticky='EWNS')
+pass_entry = tk.Entry(login)
+pass_entry.grid(row=1, column=1, sticky='EWNS')
+confirm_button=tk.Button(login, text="Confirm", command=confLog)
+confirm_button.place(x=110, y=115, width=200, height=20)
+login.geometry("400x140")
+login.config(bg="#CCCCFF")
+user_label.configure(bg="#CCCCFF", fg="black")
+user_entry.configure(bg="#CCCCFF", fg="black")
+pass_entry.configure(bg="#CCCCFF", fg="black")
+pass_label.configure(bg="#CCCCFF", fg="black")
+confirm_button.configure(bg="#CCCCFF", fg="black")
+login.mainloop()
