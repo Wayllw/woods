@@ -38,13 +38,9 @@ namespace WebApplicationToken.Controllers
                         {
                             return Unauthorized("Invalid Credentials.");
                         }
-
                     }
                 }
             }
-
-
-
         }
         private string GenerateJwtToken(string username)
         {
@@ -119,6 +115,38 @@ namespace WebApplicationToken.Controllers
                 throw new SecurityTokenException("Invalid JWT token."); // Or handle invalid tokens differently
             }
         }
+
+        [HttpPost]
+[Route("register")]
+public async Task<IActionResult> Register(LoginModel model)
+{
+    if (model == null || string.IsNullOrWhiteSpace(model.Username) || string.IsNullOrWhiteSpace(model.Password))
+    {
+        return BadRequest("Username and password must be provided.");
+    }
+    
+    try
+    {
+        using (MySqlConnection connection = await database.OpenConnectionAsync())
+        {
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = @"INSERT INTO `usuarios` (`username`, `password`) VALUES (@username, @password);";
+                command.Parameters.AddWithValue("@username", model.Username);
+                command.Parameters.AddWithValue("@password", model.Password);
+
+                await command.ExecuteNonQueryAsync();
+            }
+        }
+        return Ok("User registered successfully.");
+    }
+    catch (Exception ex)
+    {
+        // Log the exception (logging mechanism not shown here)
+        return StatusCode(500, "An error occurred while registering the user.");
+    }
+}
+
         /*
         
         private ClaimsPrincipal ValidateJwtToken0(string token)

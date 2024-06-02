@@ -25,6 +25,7 @@ using System.Text.RegularExpressions;
 using WebApplicationToken.Controllers;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
+using WebApplicationSock;
 namespace BlogPostApi;
 
 
@@ -170,7 +171,21 @@ public class BlogPostRepository(MySqlDataSource database)
             command.CommandText = @"DELETE FROM `BlogPost` WHERE `Id` = @id;"; BindId(command, blogPost);
             await command.ExecuteNonQueryAsync();
         }
+        await NotifyPostDeletion(blogPost.Id);
+
     }
+    private async Task NotifyPostDeletion(int postId)
+    {
+        // Construct a message indicating the deleted post's ID or any relevant data
+        var message = $"Post {postId} has been deleted.";
+
+        // Broadcast the message to all connected WebSocket clients
+        await WebSocketHandler.SendToAllAsync(message);
+    }
+
+    
+
+
     private async Task<IReadOnlyList<BlogPost>> ReadAllAsync(DbDataReader reader)
     {
         var posts = new List<BlogPost>();
@@ -204,17 +219,17 @@ public class BlogPostRepository(MySqlDataSource database)
         if (subject != null && expiration != null)
         {
             using var connection = await database.OpenConnectionAsync();
-        using (var command = connection.CreateCommand())
-        {
-            command.CommandText = @"INSERT INTO `BlogPost` (`Title`, `Content`) VALUES (@title, @content);";
-            foreach (BlogPost obj in body)
+            using (var command = connection.CreateCommand())
             {
-                command.Parameters.AddWithValue("@title", obj.Title);
-                command.Parameters.AddWithValue("@content", obj.Content);
-                command.ExecuteNonQuery();
-                command.Parameters.Clear();
+                command.CommandText = @"INSERT INTO `BlogPost` (`Title`, `Content`) VALUES (@title, @content);";
+                foreach (BlogPost obj in body)
+                {
+                    command.Parameters.AddWithValue("@title", obj.Title);
+                    command.Parameters.AddWithValue("@content", obj.Content);
+                    command.ExecuteNonQuery();
+                    command.Parameters.Clear();
+                }
             }
-        }
         }
     }
 

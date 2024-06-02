@@ -1,13 +1,32 @@
 import tkinter as tk
-from tkinter import font, filedialog
+from tkinter import font, filedialog, messagebox
 import requests
 import json
 import csv
 import ast
+import websocket
+import threading
 
 baseurl = "http://localhost:5175/api/blog/"
-
 tok: str = None
+
+def on_message(ws, message):
+    # Parse the JSON message received from the server
+    data = json.loads(message)
+    # Update your list or UI based on the received data
+    print("Received:", data)
+
+def connect_to_websocket_server():
+    websocket.enableTrace(True)
+    ws = websocket.WebSocketApp("ws://localhost:5175/ws",
+                                on_message=on_message
+                                )
+    ws.run_forever()
+
+
+websocket_thread = threading.Thread(target=connect_to_websocket_server)
+websocket_thread.start()
+
 
 
 def exportarInfo(id, path):
@@ -19,13 +38,11 @@ def exportarInfo(id, path):
     dict_dat = json.loads(json_dat)
     json.dump(dict_dat, fw)
     fw.write("\n")
-    print(response)
 
 
 def exportarCsv(id, path):
     global tok
     response = requests.get(baseurl+"csv/"+id + "?token=" + tok)
-    print(response.text)
     csv_file = path+".csv"
 
     csv_obj = open(csv_file, "w")
@@ -40,16 +57,16 @@ def exportarCsv(id, path):
 
 
 def addInfo(id, title, content):
-    json = {"id": id, "title": title, "content": content}
+    global tok
+    json = [{"id": id, "title": title, "content": content}]
     requests.post(baseurl + "?token=" + tok, json=json)
-    print(json)
 
 
 def importInfo(file):
+    global tok
     with open(file, "r") as importation:
         data = json.load(importation)
-    requests.post(baseurl, json=data)
-    print(data)
+    requests.post(baseurl + "?token=" + tok, json=data)
 
 
 def editInfo(id, title, content):
@@ -58,9 +75,57 @@ def editInfo(id, title, content):
     print(response.json())
 
 
-def deleteInfo(id):
-    requests.delete(baseurl+id)
+def deleteInfo():
+    def window():
+        exportarInfo("","")
+        with open(".json", "r") as importation:
+            data = json.load(importation)
 
+        root = tk.Tk()
+        root.title("Delete")
+
+        canvas = tk.Canvas(root)
+        canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        # Create a Frame to contain the labels and buttons
+        frame = tk.Frame(canvas)
+        frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+
+        # Create a Scrollbar
+        scrollbar = tk.Scrollbar(root, orient=tk.VERTICAL, command=canvas.yview)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+        # Configure the Canvas to use the scrollbar
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        # Bind the Canvas to the scrollbar
+        canvas.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+
+        # Create a window inside the Canvas to hold the content
+        canvas.create_window((0, 0), window=frame, anchor="nw")
+
+        for index,item in enumerate(data):
+            item_id = item['id']
+            tk.Label(frame, text=f"ID: {item_id}").grid(row=index, column=0, padx=10, pady=5)
+            tk.Button(frame, text="Delete", command=lambda i=item_id: send_delete_request(i, frame)).grid(row=index, column=1, padx=10, pady=5)
+
+        root.mainloop()
+
+    def send_delete_request(i, frame):
+        global tok
+        id = str(i)
+        requests.delete(baseurl + id + "?token=" + tok)
+
+        def refresh(id):
+            for widget in frame.winfo_children():
+                if isinstance(widget, tk.Label) and f"ID: {id}" in widget.cget("text"):
+                    row = widget.grid_info()["row"]
+                    for child_widget in frame.winfo_children():
+                        if child_widget.grid_info()["row"] == row:
+                            child_widget.destroy()
+                    break
+
+    window()
 
 def buildPost():
 
@@ -218,32 +283,6 @@ def buildGet():
     label_tx.configure(bg="#61affe", fg="white", font=bold)
 
 
-def buildDel():
-
-    def confirm():
-        id = entry_id.get()
-        deleteInfo(id)
-        jnl.destroy()
-
-    jnl = tk.Tk()
-    jnl.title("Introduzir dados")
-    label_id = tk.Label(jnl, text="ID:")
-    label_id.grid(row=0, column=0)
-    entry_id = tk.Entry(jnl)
-    entry_id.grid(row=0, column=1)
-    button_s = tk.Button(jnl, text="Confirmar", command=confirm)
-    text_label = tk.Label(jnl, text="Deixar o id em branco e confirmar,")
-    text_label.grid(row=1, column=0, columnspan=3)
-    textt_label = tk.Label(jnl, text="leva à destruição de todos os dados.")
-    textt_label.grid(row=2, column=0, columnspan=3)
-    button_s.grid(row=3, column=1)
-    jnl.configure(bg="#f93e3e")
-    label_id.configure(bg="#f93e3e", fg="white", font=bold)
-    button_s.configure(bg="#f93e3e", fg="white", font=bold)
-    text_label.configure(bg="#f93e3e", fg="white", font=bold)
-    textt_label.configure(bg="#f93e3e", fg="white", font=bold)
-
-
 def build():
     window = tk.Tk()
     bold = font.Font(weight="bold")
@@ -256,7 +295,7 @@ def build():
     post_entry.grid(row=0, column=1, sticky='EWNS')
     put_entry = tk.Button(window, text="Editar", command=buildPut, width=20, height=5, font=bold)
     put_entry.grid(row=1, column=0, sticky='EWNS')
-    delete_entry = tk.Button(window, text="Apagar", command=buildDel, width=20, height=5, font=bold)
+    delete_entry = tk.Button(window, text="Apagar", command=deleteInfo, width=20, height=5, font=bold)
     delete_entry.grid(row=1, column=1, sticky='EWNS')
 
     get_entry.configure(bg="#61affe", fg="white",)
@@ -270,17 +309,69 @@ def logIn(username, password):
     url = "http://localhost:5175/api/Auth/login"
     json={"username": username, "password": password}
     response = requests.post(url,json=json)
-    print(response)
     if response.status_code==200:
         login.destroy()
         tok=response.json().get('token')
         open("token.txt",'w').write(tok)
         print(tok)
+        tk.Message(text=tok).grid(row=1, column=1, sticky='EWNS')
         bt()
     elif response.status_code==401:
         print("Erro na aventura")
     else:
         print("Algo inesperado aconteceu!")
+
+
+def mensagem(mensagem:str):
+    sucesso = tk.Tk()
+    sucesso.title("Alert")
+    sucesso.eval('tk::PlaceWindow . center')
+    bold = font.Font(weight="bold")
+    message = tk.Message(sucesso, text=mensagem, font=bold, width=300)
+    message.grid(row=1, column=1)
+    sucesso.geometry("300x100")
+    sucesso.config(bg="#CCCCFF")
+    message.configure(bg="#CCCCFF", fg="black")
+    sucesso.mainloop()
+
+
+def registar(username, password):
+    url = "http://localhost:5175/api/Auth/register"
+    json = {"username": username, "password": password}
+    response = requests.post(url, json=json)
+    if response.status_code==200:
+        mensagem("Registrado com sucesso!")
+
+def nUser():
+    def conf():
+        username=user_entry.get()
+        password=pass_entry.get()
+        registar(username,password)
+
+
+    token = tk.Tk()
+    bold = font.Font(weight="bold")
+    token.title("Create new user:")
+    token.eval('tk::PlaceWindow . center')
+    user_label = tk.Label(token, text="Username:", width=15, height=2, font=bold)
+    user_label.grid(row=0, column=0, sticky='EWNS')
+    user_entry = tk.Entry(token)
+    user_entry.grid(row=0, column=1, sticky='EWNS')
+    pass_label=tk.Label(token, text="Password:", width=15, height=2, font=bold)
+    pass_label.grid(row=1, column=0, sticky='EWNS')
+    pass_entry=tk.Entry(token)
+    pass_entry.grid(row=1, column=1, sticky='EWNS')
+    confirm_button = tk.Button(token, text="Confirmar", command=conf)
+    confirm_button.place(x=110, y=105, width=200, height=20)
+
+    token.geometry("400x140")
+    token.config(bg="#CCCCFF")
+    user_label.configure(bg="#CCCCFF", fg="black")
+    user_entry.configure(bg="#CCCCFF", fg="black")
+    pass_label.configure(bg="#CCCCFF", fg="black")
+    pass_entry.configure(bg="#CCCCFF", fg="black")
+    confirm_button.configure(bg="#CCCCFF", fg="black")
+    token.mainloop()
 
 
 def confLog():
@@ -293,16 +384,17 @@ def bt():
     def cToken():
         tkn = tokn_entry.get()
         rr = requests.get("http://localhost:5175/api/Auth/validate-token?token="+tkn)
-        token.destroy()
+
         if rr.status_code==200:
+            token.destroy()
             build()
         else:
-            print("Ocorreu um erro com o token.")
+            mensagem("Ocorreu um erro com o token.")
 
 
     token = tk.Tk()
     bold = font.Font(weight="bold")
-    token.title("Select what u want to do:")
+    token.title("Token")
     token.eval('tk::PlaceWindow . center')
     tokn_label = tk.Label(token, text="Token:", width=15, height=2, font=bold)
     tokn_label.grid(row=0, column=0, sticky='EWNS')
@@ -321,7 +413,7 @@ def bt():
 
 login = tk.Tk()
 bold = font.Font(weight="bold")
-login.title("Select what u want to do:")
+login.title("Log In")
 login.eval('tk::PlaceWindow . center')
 user_label = tk.Label(login, text="User:", width=15, height=2, font=bold)
 user_label.grid(row=0, column=0, sticky='EWNS')
@@ -332,12 +424,16 @@ pass_label.grid(row=1, column=0, sticky='EWNS')
 pass_entry = tk.Entry(login)
 pass_entry.grid(row=1, column=1, sticky='EWNS')
 confirm_button=tk.Button(login, text="Confirm", command=confLog)
-confirm_button.place(x=110, y=115, width=200, height=20)
-login.geometry("400x140")
+confirm_button.place(x=110, y=115, width=200, height=25)
+r_button = tk.Button(login, text="New User", command=nUser)
+r_button.place(x=110, y=145, width=200, height=25)
+login.geometry("400x180")
 login.config(bg="#CCCCFF")
 user_label.configure(bg="#CCCCFF", fg="black")
 user_entry.configure(bg="#CCCCFF", fg="black")
 pass_entry.configure(bg="#CCCCFF", fg="black")
 pass_label.configure(bg="#CCCCFF", fg="black")
 confirm_button.configure(bg="#CCCCFF", fg="black")
+r_button.configure(bg="#CCCCFF", fg="black")
 login.mainloop()
+

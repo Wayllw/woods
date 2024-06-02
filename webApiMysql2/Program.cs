@@ -2,15 +2,19 @@ using BlogPostApi;
 using Microsoft.AspNetCore.Mvc;
 using MySqlConnector;
 using WebApplicationToken.Controllers;
+using WebApplicationSock;
+
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddControllers();
+
 // Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at
-//https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddMySqlDataSource(builder.Configuration.GetConnectionString("Default")!);
+builder.Services.AddWebSocketManager();
+
 var app = builder.Build();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -18,16 +22,21 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseHttpsRedirection();
+app.UseAuthorization();
+app.MapControllers();
 
+// Configure WebSocket server
+var webSocketPort = builder.Configuration.GetValue<int>("WebSocketServer:Port");
+app.UseWebSockets();
+app.MapWebSocketManager("/ws", new WebSocketHandler());
 
-// GET api/blog
+// Configure the HTTP API endpoints
 app.MapGet("/api/blog", async ([FromServices] MySqlDataSource db, string token) =>
 {
     var repository = new BlogPostRepository(db);
     return await repository.LatestPostsAsync(token);
 });
 
-// GET api/blog/5
 app.MapGet("/api/blog/{id}", async ([FromServices] MySqlDataSource db, int id, string token) =>
 {
     var repository = new BlogPostRepository(db);
@@ -48,17 +57,13 @@ app.MapGet("/api/blog/csv/{id}", async ([FromServices] MySqlDataSource db, int i
     return result is null ? Results.NotFound() : Results.Ok(result);
 });
 
-
-
-// POST api/blog
 app.MapPost("/api/blog", async ([FromServices] MySqlDataSource db, [FromBody] List<BlogPost> body, string token) =>
 {
     var repository = new BlogPostRepository(db);
     await repository.InsertAsync2(body, token);
-      return body;
+    return body;
 });
 
-// PUT api/blog/5
 app.MapPut("/api/blog/{id}", async (int id, [FromServices] MySqlDataSource db, [FromBody] BlogPost body, string token) =>
 {
     var repository = new BlogPostRepository(db);
@@ -71,7 +76,6 @@ app.MapPut("/api/blog/{id}", async (int id, [FromServices] MySqlDataSource db, [
     return Results.Ok(result);
 });
 
-// DELETE api/blog/5
 app.MapDelete("/api/blog/{id}", async ([FromServices] MySqlDataSource db, int id, string token) =>
 {
     var repository = new BlogPostRepository(db);
@@ -82,14 +86,12 @@ app.MapDelete("/api/blog/{id}", async ([FromServices] MySqlDataSource db, int id
     return Results.NoContent();
 });
 
-// DELETE api/blog
 app.MapDelete("/api/blog", async ([FromServices] MySqlDataSource db, string token) =>
 {
     var repository = new BlogPostRepository(db);
     await repository.DeleteAllAsync(token);
     return Results.NoContent();
 });
-app.UseHttpsRedirection();
-app.UseAuthorization();
-app.MapControllers();
-app.Run();
+
+// Start the app
+app.Run($"http://localhost:{webSocketPort}"); 
