@@ -9,13 +9,11 @@ import threading
 
 baseurl = "http://localhost:5175/api/blog/"
 tok: str = None
+rsp: str = None
 
 def on_message(ws, message):
-    # Parse the JSON message received from the server
-    data = json.loads(message)
-    # Update your list or UI based on the received data
-    print("Received:", data)
-
+    global rsp
+    rsp = message
 def connect_to_websocket_server():
     websocket.enableTrace(True)
     ws = websocket.WebSocketApp("ws://localhost:5175/ws",
@@ -113,17 +111,17 @@ def deleteInfo():
 
     def send_delete_request(i, frame):
         global tok
+        global rsp
         id = str(i)
         requests.delete(baseurl + id + "?token=" + tok)
 
-        def refresh(id):
-            for widget in frame.winfo_children():
-                if isinstance(widget, tk.Label) and f"ID: {id}" in widget.cget("text"):
-                    row = widget.grid_info()["row"]
-                    for child_widget in frame.winfo_children():
-                        if child_widget.grid_info()["row"] == row:
-                            child_widget.destroy()
-                    break
+        for widget in frame.winfo_children():
+            if isinstance(widget, tk.Label) and f"ID: {rsp}" in widget.cget("text"):
+                row = widget.grid_info()["row"]
+                for child_widget in frame.winfo_children():
+                    if child_widget.grid_info()["row"] == row:
+                        child_widget.destroy()
+                break
 
     window()
 

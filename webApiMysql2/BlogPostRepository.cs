@@ -177,7 +177,7 @@ public class BlogPostRepository(MySqlDataSource database)
     private async Task NotifyPostDeletion(int postId)
     {
         // Construct a message indicating the deleted post's ID or any relevant data
-        var message = $"Post {postId} has been deleted.";
+        var message = $"{postId}";
 
         // Broadcast the message to all connected WebSocket clients
         await WebSocketHandler.SendToAllAsync(message);
