@@ -94,4 +94,4 @@ app.MapDelete("/api/blog", async ([FromServices] MySqlDataSource db, string toke
 });
 
 // Start the app
-app.Run($"http://localhost:{webSocketPort}"); 
+app.Run($"http://localhost:{webSocketPort}");

@@ -183,7 +183,7 @@ public class BlogPostRepository(MySqlDataSource database)
         await WebSocketHandler.SendToAllAsync(message);
     }
 
-    
+
 
 
     private async Task<IReadOnlyList<BlogPost>> ReadAllAsync(DbDataReader reader)
