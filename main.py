@@ -250,7 +250,7 @@ def buildGet():
         jnl.destroy()
 
     jnl = tk.Tk()
-    jnl.title("Introduzir dados")
+    jnl.title("Exportar dados")
     label_id = tk.Label(jnl, text="ID:")
     label_id.grid(row=0, column=0)
     entry_id = tk.Entry(jnl)
