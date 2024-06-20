@@ -14,6 +14,7 @@ rsp: str = None
 def on_message(ws, message):
     global rsp
     rsp = message
+
 def connect_to_websocket_server():
     websocket.enableTrace(True)
     ws = websocket.WebSocketApp("ws://localhost:5175/ws",

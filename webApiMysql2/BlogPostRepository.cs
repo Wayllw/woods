@@ -1,28 +1,7 @@
-using System;
-using System.IO;
-using System.Xml;
 using System.Text;
-using System.Runtime;
-using System.Xml.Xsl;
 using Newtonsoft.Json;
-using System.Xml.Linq;
-using System.Xml.XPath;
-using System.Xml.Schema;
-using Newtonsoft.Json.Linq;
-using System.Linq.Expressions;
-using System.Collections.Generic;
-
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Text.Json.Serialization;
-using System.Text.Json.Nodes;
-using System.Text.Json;
-
-
-
 using System.Data.Common;
 using MySqlConnector;
-using System.Text.RegularExpressions;
-using WebApplicationToken.Controllers;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using WebApplicationSock;
@@ -49,9 +28,8 @@ public class BlogPostRepository(MySqlDataSource database)
         {
             return null;
         }
-
-
     }
+
     public async Task<IReadOnlyList<BlogPost>> LatestPostsAsync(string token)
     {
 
@@ -67,8 +45,6 @@ public class BlogPostRepository(MySqlDataSource database)
         {
             return null;
         }
-
-
     }
 
     public async Task<string> transCsv(string token)
@@ -182,9 +158,6 @@ public class BlogPostRepository(MySqlDataSource database)
         // Broadcast the message to all connected WebSocket clients
         await WebSocketHandler.SendToAllAsync(message);
     }
-
-
-
 
     private async Task<IReadOnlyList<BlogPost>> ReadAllAsync(DbDataReader reader)
     {
