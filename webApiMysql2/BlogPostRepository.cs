@@ -183,7 +183,8 @@ public class BlogPostRepository(MySqlDataSource database)
     }
     private static void BindParams(MySqlCommand cmd, BlogPost blogPost)
     {
-        cmd.Parameters.AddWithValue("@title", blogPost.Title); cmd.Parameters.AddWithValue("@content", blogPost.Content);
+        cmd.Parameters.AddWithValue("@title", blogPost.Title);
+        cmd.Parameters.AddWithValue("@content", blogPost.Content);
     }
 
     internal async Task InsertAsync2(List<BlogPost> body, string token)
