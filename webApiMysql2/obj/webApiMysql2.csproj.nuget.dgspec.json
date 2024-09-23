@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\rui26\\PycharmProjects\\woods\\webApiMysql2\\webApiMysql2.csproj": {}
+    "c:\\Users\\rui26\\PycharmProjects\\woods\\webApiMysql2\\webApiMysql2.csproj": {}
   },
   "projects": {
-    "C:\\Users\\rui26\\PycharmProjects\\woods\\webApiMysql2\\webApiMysql2.csproj": {
+    "c:\\Users\\rui26\\PycharmProjects\\woods\\webApiMysql2\\webApiMysql2.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\rui26\\PycharmProjects\\woods\\webApiMysql2\\webApiMysql2.csproj",
+        "projectUniqueName": "c:\\Users\\rui26\\PycharmProjects\\woods\\webApiMysql2\\webApiMysql2.csproj",
         "projectName": "webApiMysql2",
-        "projectPath": "C:\\Users\\rui26\\PycharmProjects\\woods\\webApiMysql2\\webApiMysql2.csproj",
+        "projectPath": "c:\\Users\\rui26\\PycharmProjects\\woods\\webApiMysql2\\webApiMysql2.csproj",
         "packagesPath": "C:\\Users\\rui26\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\rui26\\PycharmProjects\\woods\\webApiMysql2\\obj\\",
+        "outputPath": "c:\\Users\\rui26\\PycharmProjects\\woods\\webApiMysql2\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\rui26\\AppData\\Roaming\\NuGet\\NuGet.Config",

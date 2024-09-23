@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "wSqBllVxvLCfuq/pAcNY3WCLPJ4zeMdCcAmXKHCqCzh5OZwsfLQxEDMnSALq7c4qC52TnWgmw/yQxjuY5B7Ckw==",
+  "dgSpecHash": "pld5VDp2ChyOPPSRqXF0MwJMrXxMvK0cZFbs6d9eRTFoa7UOs81eKPlJ6O9Z//3bYnChvMV2b6hFoEiXS7S4ng==",
   "success": true,
-  "projectFilePath": "C:\\Users\\rui26\\PycharmProjects\\woods\\webApiMysql2\\webApiMysql2.csproj",
+  "projectFilePath": "c:\\Users\\rui26\\PycharmProjects\\woods\\webApiMysql2\\webApiMysql2.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\rui26\\.nuget\\packages\\microsoft.aspnetcore.openapi\\8.0.3\\microsoft.aspnetcore.openapi.8.0.3.nupkg.sha512",
     "C:\\Users\\rui26\\.nuget\\packages\\microsoft.extensions.apidescription.server\\6.0.5\\microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",
