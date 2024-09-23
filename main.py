@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import font, filedialog, messagebox
+from tkinter import font, filedialog
 import requests
 import json
 import csv
@@ -8,12 +8,14 @@ import websocket
 import threading
 
 baseurl = "http://localhost:5175/api/blog/"
-tok: str = None
-rsp: str = None
+tok: str
+rsp: str
+
 
 def on_message(ws, message):
     global rsp
     rsp = message
+
 
 def connect_to_websocket_server():
     websocket.enableTrace(True)
@@ -316,7 +318,7 @@ def logIn(username, password):
         tk.Message(text=tok).grid(row=1, column=1, sticky='EWNS')
         bt()
     elif response.status_code==401:
-        print("Erro na aventura")
+        print("Erro na execução do código.")
     else:
         print("Algo inesperado aconteceu!")
 
